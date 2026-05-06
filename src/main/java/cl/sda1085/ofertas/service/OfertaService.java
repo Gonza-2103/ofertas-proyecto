@@ -7,6 +7,7 @@ import cl.sda1085.ofertas.repository.OfertaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -34,6 +35,9 @@ public class OfertaService {
         oferta.setMonto(dto.getMonto());
         oferta.setIdUsuario(dto.getIdUsuario());
         oferta.setIdProducto(dto.getIdProducto());
+
+        //Servidor registra el momento exacto en que se hizo la puja
+        oferta.setFechaHora(LocalDateTime.now());
 
         //Guardar en la base de datos
         Oferta ofertaGuardada = ofertaRepository.save(oferta);
