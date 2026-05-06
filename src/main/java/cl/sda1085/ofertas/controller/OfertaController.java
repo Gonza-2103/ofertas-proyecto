@@ -6,6 +6,7 @@ import cl.sda1085.ofertas.dto.OfertaResponseDTO;
 import cl.sda1085.ofertas.service.OfertaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,7 +36,7 @@ public class OfertaController {
     public ResponseEntity<OfertaResponseDTO> crearOferta(
            @Valid @RequestBody OfertaRequestDTO dto) {
 
-        return ResponseEntity.status(201).body(ofertaService.guardar(dto));
+        return ResponseEntity.status(HttpStatus.CREATED).body(ofertaService.guardar(dto));
 
 
     }
