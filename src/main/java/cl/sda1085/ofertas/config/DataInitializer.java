@@ -14,7 +14,6 @@ import java.util.List;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-
 public class DataInitializer implements CommandLineRunner {
 
     private final OfertaRepository ofertaRepository;
@@ -25,27 +24,23 @@ public class DataInitializer implements CommandLineRunner {
             log.info("Base de datos de ofertas ya contiene datos. Omitiendo inicialización.");
             return;
         }
-
-        log.info("Inicializando la creación de ofertas (pujas) de prueba");
+        log.info("Inicializando la creación de ofertas (pujas) de prueba...");
 
 
         //Ofertas para el producto 1:Vasija precolombina (precio base: 150.000)
-
         Oferta oferta1 = new Oferta(
                 null,
                 new BigDecimal("160000"),
                 LocalDateTime.now().minusHours(5),
                 5L,
-                1L
-        );
+                1L);
 
         Oferta oferta2 = new Oferta(
                 null,
                 new BigDecimal("175000"),
                 LocalDateTime.now().minusHours(2),
                 6L,
-                1L
-        );
+                1L);
 
         //Ofertas para el producto 2: Espada medieval (precio base: 300.000)
         Oferta oferta3 = new Oferta(
@@ -53,8 +48,7 @@ public class DataInitializer implements CommandLineRunner {
                 new BigDecimal("310000"),
                 LocalDateTime.now().minusDays(1),
                 7L,
-                2L
-        );
+                2L);
 
         //Ofertas para el producto 3: Pintura colonial (precio base: 500.000)
         Oferta oferta4 = new Oferta(
@@ -62,8 +56,7 @@ public class DataInitializer implements CommandLineRunner {
                 new BigDecimal("550000"),
                 LocalDateTime.now().minusMinutes(30),
                 5L,
-                3L
-        );
+                3L);
 
         // Ofertas para el producto 4: Máscara tribal africana (precio base: 220.000)
         Oferta oferta6 = new Oferta(
@@ -71,16 +64,14 @@ public class DataInitializer implements CommandLineRunner {
                 new BigDecimal("230000"),
                 LocalDateTime.now().minusDays(2),
                 8L,
-                4L
-        );
+                4L);
 
         Oferta oferta7 = new Oferta(
                 null,
                 new BigDecimal("250000"),
                 LocalDateTime.now().minusHours(1),
                 10L,
-                4L
-        );
+                4L);
 
         // Ofertas para el producto 5: Reloj de bolsillo antiguo (precio base: 400.000)
         Oferta oferta8 = new Oferta(
@@ -133,25 +124,21 @@ public class DataInitializer implements CommandLineRunner {
                 new BigDecimal("850000.00"),
                 LocalDateTime.now().minusDays(3),
                 11L,
-                14L
-        );
+                14L);
 
         Oferta oferta15 = new Oferta(
                 null,
                 new BigDecimal("950000.00"),
                 LocalDateTime.now().minusDays(1),
                 5L,
-                14L
-        );
+                14L);
 
         Oferta oferta16 = new Oferta(
                 null,
                 new BigDecimal("1000000.00"),
                 LocalDateTime.now().minusMinutes(15),
                 8L,
-                14L
-        );
-
+                14L);
 
         ofertaRepository.saveAll(List.of(
                 oferta1, oferta2, oferta3, oferta4, oferta6, oferta7, oferta8,

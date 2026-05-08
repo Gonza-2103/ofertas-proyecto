@@ -12,20 +12,26 @@ import java.util.Map;
 
 public class GlobalExceptionHandler {
 
+    //Errores de validación (@Valid en los DTOs)
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String,String>> handleValidationErrors(MethodArgumentNotValidException ex){
-        Map<String,String> errores = new LinkedHashMap<>();
+    public ResponseEntity<Map<String, String>> handleValidationErrors(MethodArgumentNotValidException ex) {
+        Map<String, String> errores = new LinkedHashMap<>();
 
-        ex.getBindingResult().getFieldErrors().forEach((error) ->
-                errores.put(error.getField(), error.getDefaultMessage()));
+        ex.getBindingResult().getFieldErrors().forEach(error ->
+
+                errores.put(error.getField(), error.getDefaultMessage()));  //Usamos merge por si un mismo campo tiene varios errores (ej: @NotNull y @Min)
         return ResponseEntity.badRequest().body(errores);
     }
 
+    //Errores de lógica de negocio (RuntimeException personalizados)
     @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<Map<String,String>> handleRuntimeException(RuntimeException ex){
-        Map<String,String> error = new LinkedHashMap<>();
-        error.put("error", ex.getMessage());
+    public ResponseEntity<Map<String, String>> handleRuntimeException(RuntimeException ex) {
+        Map<String, String> error = new LinkedHashMap<>();
+
+        // Agregamos una llave descriptiva para que el JSON sea más claro
+        error.put("mensaje", ex.getMessage());
+        error.put("tipo", "Error de Negocio");
+
         return ResponseEntity.badRequest().body(error);
     }
-
 }
