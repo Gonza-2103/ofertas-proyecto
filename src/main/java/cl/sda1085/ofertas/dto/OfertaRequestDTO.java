@@ -21,6 +21,6 @@ public class OfertaRequestDTO {
     @NotNull(message = "El ID del usuario es obligatorio.")
     private Long idUsuario;
 
-    @NotNull(message = "El ID del producto es obligatorio.")
-    private Long idProducto;
+    @NotNull(message = "El ID de la subasta es obligatorio.")
+    private Long idSubasta;
 }

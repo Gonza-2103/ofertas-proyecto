@@ -32,5 +32,5 @@ public class Oferta {
     private Long idUsuario;
 
     @Column(nullable = false)
-    private Long idProducto;
+    private Long idSubasta;
 }

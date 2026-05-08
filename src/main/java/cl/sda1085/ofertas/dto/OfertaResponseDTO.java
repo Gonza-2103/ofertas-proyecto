@@ -20,5 +20,5 @@ public class OfertaResponseDTO {
     private BigDecimal monto;
     private LocalDateTime fechaHora;
     private Long idUsuario;
-    private Long idProducto;
+    private Long idSubasta;
 }
