@@ -8,7 +8,6 @@ import reactor.core.publisher.Mono;
 
 import java.util.Map;
 
-
 @Component
 public class SubastaClient {
 
@@ -19,12 +18,12 @@ public class SubastaClient {
         this.webClient = webClientBuilder.baseUrl(urlSubastas).build();
     }
 
-    public Map<String, Object> obtenerUsuarioPorId(Long id) {
+    public Map<String, Object> obtenerSubastaPorId(Long id) {
         return this.webClient.get()
                 .uri("/{id}", id)
                 .retrieve()
                 .onStatus(status -> status.is4xxClientError(),
-                        response -> Mono.error(new RuntimeException("El usuario con ID " + id + " no existe. No puede realizar ofertas.")))
+                        response -> Mono.error(new RuntimeException("La subasta con ID " + id + " no existe. No se puede registrar la oferta.")))
                 .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
                 .block();
     }
