@@ -5,6 +5,7 @@ import cl.sda1085.ofertas.dto.OfertaResponseDTO;
 import cl.sda1085.ofertas.model.Oferta;
 import cl.sda1085.ofertas.repository.OfertaRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -13,8 +14,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
+
 public class OfertaService {
 
     private final OfertaRepository ofertaRepository;
@@ -25,6 +28,7 @@ public class OfertaService {
 
     //Método de apoyo para encapsulamiento de datos
     private OfertaResponseDTO mapToResponseDTO(Oferta oferta) {
+
         return new OfertaResponseDTO(
                 oferta.getId(),
                 oferta.getMonto(),
@@ -36,41 +40,81 @@ public class OfertaService {
 
     //Obtener todas las ofertas
     public List<OfertaResponseDTO> obtenerTodas() {
-        return ofertaRepository.findAll().stream()
+        log.info("Iniciando recuperación de todas las ofertas");
+        List<Oferta> ofertas = ofertaRepository.findAll();
+        log.debug("Se recuperaron"+ ofertas.size() + "ofertas de la base de datos");
+
+        return ofertas.stream()
                 .map(this::mapToResponseDTO)
                 .collect(Collectors.toList());
     }
 
     //Obtener oferta por ID
     public Optional<OfertaResponseDTO> obtenerPorId(Long id) {
-        return ofertaRepository.findById(id).map(this::mapToResponseDTO);
+        return ofertaRepository.findById(id)
+                .map(oferta -> {
+                    log.debug("Oferta encontrada para el ID: {}", id);
+                    return mapToResponseDTO(oferta);
+                })
+                .or(() -> {
+                    log.warn("No s encontró la oferta con ID: {}", id);
+                    return  Optional.empty();
+                });
     }
 
     //Guardar (crear) oferta
     public OfertaResponseDTO guardar(OfertaRequestDTO dto) {
+
+        log.info("Registrando nueva oferta: Monto {} para la subasta ID {} por el usuario ID {}",
+                dto.getMonto(), dto.getIdSubasta(), dto.getIdUsuario());
+
         Oferta oferta = new Oferta();
         oferta.setMonto(dto.getMonto());
         oferta.setIdUsuario(dto.getIdUsuario());
         oferta.setIdSubasta(dto.getIdSubasta());  //IMPORTANTE: La oferta suele ligarse al ID de la SUBASTA
         oferta.setFechaHora(LocalDateTime.now());  //Registro del momento exacto de la puja
 
+        Oferta ofertaGuardada = ofertaRepository.save(oferta);
+        log.debug("Oferta guardada exitosamente con ID: {}", ofertaGuardada.getId());
+
         return mapToResponseDTO(ofertaRepository.save(oferta));
     }
 
     //Actualizar oferta
     public Optional<OfertaResponseDTO> actualizar(Long id, OfertaRequestDTO dto){
-        return ofertaRepository.findById(id).map(ofertaExistente -> {
-            ofertaExistente.setMonto(dto.getMonto());
-            ofertaExistente.setIdUsuario(dto.getIdUsuario());
-            ofertaExistente.setIdSubasta(dto.getIdSubasta());
+        log.info("Iniciando actualización para la oferta con ID: {}", id);
 
-            return mapToResponseDTO(ofertaRepository.save(ofertaExistente));
-        });
+
+        return ofertaRepository.findById(id)
+                .map(ofertaExistente -> {
+
+                            log.debug("Oferta encontrada. Actualizando monto de {} a {}",
+                                    ofertaExistente.getMonto(), dto.getMonto());
+
+                            ofertaExistente.setMonto(dto.getMonto());
+                            ofertaExistente.setIdUsuario(dto.getIdUsuario());
+                            ofertaExistente.setIdSubasta(dto.getIdSubasta());
+
+                            Oferta actualizada = ofertaRepository.save(ofertaExistente);
+                            log.info("Oferta ID: {} actualizada exitosamente", id);
+                            return mapToResponseDTO(actualizada);
+                        }).or(() -> {
+                            log.warn("No se pudo actualizar: La oferta con ID no existe", id);
+                            return Optional.empty();
+                });
+
+
     }
 
     //Eliminar oferta
-    public void eliminar(Long id){
-        ofertaRepository.deleteById(id);
+    public void eliminar(Long id) {
+        log.info("Intentando eliminar la oferta con ID: {}", id);
+        if (ofertaRepository.existsById(id)) {
+            ofertaRepository.deleteById(id);
+            log.info("Oferta con ID: {} eliminada correctamente", id);
+        } else {
+            log.error("Error al eliminar: No se encontró la oferta con ID: {}", id);
+        }
     }
 
 
@@ -80,12 +124,24 @@ public class OfertaService {
 
     //Obtener la oferta más alta (Posible ganador)
     public Optional<OfertaResponseDTO> obtenerOfertaMasAlta(Long idSubasta) {
-        return ofertaRepository.findFirstByIdSubastaOrderByMontoDesc(idSubasta)
-                .map(this::mapToResponseDTO);
+        log.info("Buscando la oferta más alta para la subasta ID: {}", idSubasta);
+        Optional <Oferta> oferta = ofertaRepository.findFirstByIdSubastaOrderByMontoDesc(idSubasta);
+
+        if (oferta.isPresent()) {
+            log.debug("Oferta más alta encontrada: ID", oferta.get().getId());
+        } else {
+            log.debug("No se encontraron ofertas para la subasta ID: {}", idSubasta);
+        }
+
+        return oferta.map(this::mapToResponseDTO);
     }
 
     //Buscar ofertas de un usuario específico
     public List<OfertaResponseDTO> obtenerOfertasPorUsuario(Long idUsuario) {
+        log.info("Buscando ofertas del usuario ID: {}", idUsuario);
+        List<Oferta> ofertas = ofertaRepository.findByIdUsuario(idUsuario);
+        log.debug("El usuario " + idUsuario + "tiene" + ofertas.size() + "oferta registradas");
+
         return ofertaRepository.findByIdUsuario(idUsuario).stream()
                 .map(this::mapToResponseDTO)
                 .collect(Collectors.toList());

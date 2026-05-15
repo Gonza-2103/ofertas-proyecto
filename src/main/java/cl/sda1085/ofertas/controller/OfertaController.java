@@ -6,6 +6,7 @@ import cl.sda1085.ofertas.dto.OfertaResponseDTO;
 import cl.sda1085.ofertas.service.OfertaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,9 +14,11 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/ofertas")
 @RequiredArgsConstructor
+
 public class OfertaController {
 
     private final OfertaService ofertaService;
@@ -26,6 +29,7 @@ public class OfertaController {
 
     @GetMapping
     public ResponseEntity<List<OfertaResponseDTO>> obtenerTodas() {
+        log.info("Recibida petiión gET para listar todas las ofertas");
         return ResponseEntity.ok(ofertaService.obtenerTodas());
     }
 
@@ -39,6 +43,7 @@ public class OfertaController {
     @PostMapping
     public ResponseEntity<OfertaResponseDTO> crearOferta(
             @Valid @RequestBody OfertaRequestDTO dto){
+        log.warn("Petición POST recibida para crear oferta de usuario: {}", dto.getIdUsuario());
         return ResponseEntity.status(HttpStatus.CREATED).body(ofertaService.guardar(dto));
     }
 
@@ -46,13 +51,22 @@ public class OfertaController {
     public ResponseEntity<OfertaResponseDTO> actualizar(
             @PathVariable Long id,
             @Valid @RequestBody OfertaRequestDTO dto){
+        log.info("Recibida petición PUT para actualizar la oferta ID: {}", id);
+
         return ofertaService.actualizar(id, dto)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .map(response -> {
+                    log.debug("Respuesta exitosa para actualización de ID: {}", id);
+                    return ResponseEntity.ok(response);
+                })
+                .orElseGet(() -> {
+                    log.warn("Respuesta 404: Oferta ID {} no encontrada para actualizar", id);
+                    return ResponseEntity.notFound().build();
+                });
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void>  eliminar(@PathVariable Long id) {
+        log.warn("Petición de eliminación para la oferta ID: {}", id);
         ofertaService.eliminar(id);
         return ResponseEntity.noContent().build();
     }
