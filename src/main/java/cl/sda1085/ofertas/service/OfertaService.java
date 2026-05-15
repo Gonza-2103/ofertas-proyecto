@@ -142,31 +142,46 @@ public class OfertaService {
         List<Oferta> ofertas = ofertaRepository.findByIdUsuario(idUsuario);
         log.debug("El usuario " + idUsuario + "tiene" + ofertas.size() + "oferta registradas");
 
-        return ofertaRepository.findByIdUsuario(idUsuario).stream()
+        return ofertas.stream()
+                .map(this::mapToResponseDTO)
+                .collect(Collectors.toList());
+    }
+
+
+    //Buscar ofertas que superen un monto en una subasta
+    public List<OfertaResponseDTO> obtenerOfertasMayoresA(Long idSubasta, BigDecimal monto) {
+        log.info("Buscando ofertas en subasta {} superiores a : {}", idSubasta, monto);
+        List<Oferta> ofertas = ofertaRepository.findByIdSubastaAndMontoGreaterThan(idSubasta,monto);
+        log.debug("Se encontraron" + ofertas.size() + " ofertas que superan el monto" + monto);
+        return ofertas.stream()
                 .map(this::mapToResponseDTO)
                 .collect(Collectors.toList());
     }
 
     //Contar ofertas de una subasta (Devuelve Long, no DTO)
     public Long contarOfertasPorSubasta(Long idSubasta) {
-        return ofertaRepository.countByIdSubasta(idSubasta);
-    }
+        log.info("Contando ofertas para la subasa ID: {}", idSubasta);
+        Long total = ofertaRepository.countByIdSubasta(idSubasta);
+        log.debug("Total de ofertas para la subasta {}: {}", idSubasta, total);
 
-    //Buscar ofertas que superen un monto en una subasta
-    public List<OfertaResponseDTO> obtenerOfertasMayoresA(Long idSubasta, BigDecimal monto) {
-        return ofertaRepository.findByIdSubastaAndMontoGreaterThan(idSubasta, monto).stream()
-                .map(this::mapToResponseDTO)
-                .collect(Collectors.toList());
+        return total;
     }
 
     //Verificar si un usuario ya participó (Devuelve boolean)
     public boolean verificarSiUsuarioOferto(Long idUsuario, Long idSubasta) {
-        return ofertaRepository.existsByIdUsuarioAndIdSubasta(idUsuario, idSubasta);
+        log.info("Verificando participacón del usuario {} en subasta {}", idUsuario,idSubasta);
+        boolean existe = ofertaRepository.existsByIdUsuarioAndIdSubasta(idUsuario, idSubasta);
+        log.debug("¿Usuario" + idUsuario + "ya participó?:" + existe);
+        return existe;
     }
 
     //Obtener el Top 3 de ofertas
     public List<OfertaResponseDTO> obtenerTop3Subasta(Long idSubasta) {
-        return ofertaRepository.findTop3ByIdSubastaOrderByMontoDesc(idSubasta).stream()
+        log.info("Recuperando el Top 3 de ofertas para la subasta ID: {}" + idSubasta );
+        List<Oferta> topOfertas = ofertaRepository.findTop3ByIdSubastaOrderByMontoDesc(idSubasta);
+        log.debug("Top 3 recuperado. Cantidad de ofertas obtenidas: " + topOfertas.size());
+
+        return topOfertas.stream()
                 .map(this::mapToResponseDTO)
                 .collect(Collectors.toList());
     }

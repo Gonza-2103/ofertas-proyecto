@@ -80,14 +80,20 @@ public class OfertaController {
     //GET /api/ofertas/usuario/{idUsuario}
     @GetMapping("/usuario/{idUsuario}")
     public ResponseEntity<List<OfertaResponseDTO>> obtenerPorUsuario(@PathVariable Long idUsuario) {
-        return ResponseEntity.ok(ofertaService.obtenerOfertasPorUsuario(idUsuario));
+        log.info("Recibida petición GET para obtener ofertas del usuario ID: {}", idUsuario);
+        List<OfertaResponseDTO> ofertas = ofertaService.obtenerOfertasPorUsuario(idUsuario);
+        log.info("Se enviaron " + ofertas.size() + "ofertas para el usuario ID: {}" + idUsuario);
+        return ResponseEntity.ok(ofertas);
     }
 
     //Cuenta cuántas ofertas se han realizado en una subasta
     //GET /api/ofertas/subasta/{idSubasta}/total
     @GetMapping("/subasta/{idSubasta}/total")
     public ResponseEntity<Long> contarOfertas(@PathVariable Long idSubasta) {
-        return ResponseEntity.ok(ofertaService.contarOfertasPorSubasta(idSubasta));
+        log.info("Recibida petición GET para contar ofertas de la subasta ID: {}", idSubasta);
+        Long total = ofertaService.contarOfertasPorSubasta(idSubasta);
+        log.info("Total contabilizado para subasta {}: {}", idSubasta, total);
+        return ResponseEntity.ok(total);
     }
 
     //Busca ofertas que superen un monto en una subasta específica.
@@ -96,7 +102,10 @@ public class OfertaController {
     public ResponseEntity<List<OfertaResponseDTO>> obtenerOfertasMayores(
             @PathVariable Long idSubasta,
             @RequestParam BigDecimal monto) {
-        return ResponseEntity.ok(ofertaService.obtenerOfertasMayoresA(idSubasta, monto));
+        log.info("Recibida petición GET para ofertas en subasta {} superiores a: {}", idSubasta, monto);
+        List<OfertaResponseDTO> ofertas = ofertaService.obtenerOfertasMayoresA(idSubasta, monto);
+        log.info("Encontradas" + ofertas.size() + " ofertas que superan el monto solicitado");
+        return ResponseEntity.ok(ofertas);
     }
 
     //Verifica si un usuario ya ha realizado alguna oferta en una subasta
@@ -105,13 +114,19 @@ public class OfertaController {
     public ResponseEntity<Boolean> verificarParticipacion(
             @PathVariable Long idUsuario,
             @PathVariable Long idSubasta) {
-        return ResponseEntity.ok(ofertaService.verificarSiUsuarioOferto(idUsuario, idSubasta));
+        log.info("Recibida petición GET para verificar participación del usuario {} en subasta {}", idUsuario, idSubasta);
+        boolean participo = ofertaService.verificarSiUsuarioOferto(idUsuario, idSubasta);
+        log.info("Resultado de verificación para usuario" + idUsuario+  "en subasta" + idSubasta + ":" +participo);
+        return ResponseEntity.ok(participo);
     }
 
     //Obtiene las 3 ofertas más altas de una subasta (Podium).
     //GET /api/ofertas/subasta/{idSubasta}/top3
     @GetMapping("/subasta/{idSubasta}/top3")
     public ResponseEntity<List<OfertaResponseDTO>> obtenerTop3(@PathVariable Long idSubasta) {
-        return ResponseEntity.ok(ofertaService.obtenerTop3Subasta(idSubasta));
+        log.info("Recibida petición GET para obtener el Top 3 de la subasta ID: {}", idSubasta);
+        List<OfertaResponseDTO> top3 = ofertaService.obtenerTop3Subasta(idSubasta);
+        log.info("Enviando Top" + top3.size() +  "de ofertas para la subasta" + idSubasta);
+        return ResponseEntity.ok(top3);
     }
 }
