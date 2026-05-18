@@ -23,8 +23,8 @@ import java.util.stream.Collectors;
 public class OfertaService {
 
     private final OfertaRepository ofertaRepository;
-    private UsuarioClient usuarioClient;
-    private SubastaClient subastaClient;
+    private final UsuarioClient usuarioClient;
+    private final SubastaClient subastaClient;
 
     //==============================
     //CRUD estándar
