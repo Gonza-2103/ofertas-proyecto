@@ -4,6 +4,8 @@ import cl.sda1085.ofertas.dto.OfertaRequestDTO;
 import cl.sda1085.ofertas.dto.OfertaResponseDTO;
 import cl.sda1085.ofertas.model.Oferta;
 import cl.sda1085.ofertas.repository.OfertaRepository;
+import cl.sda1085.ofertas.webclient.SubastaClient;
+import cl.sda1085.ofertas.webclient.UsuarioClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,8 @@ import java.util.stream.Collectors;
 public class OfertaService {
 
     private final OfertaRepository ofertaRepository;
+    private UsuarioClient usuarioClient;
+    private SubastaClient subastaClient;
 
     //==============================
     //CRUD estándar
@@ -68,6 +72,13 @@ public class OfertaService {
         log.info("Registrando nueva oferta: Monto {} para la subasta ID {} por el usuario ID {}",
                 dto.getMonto(), dto.getIdSubasta(), dto.getIdUsuario());
 
+        // 1. Validar que el usuario existe
+        usuarioClient.obtenerUsuarioPorId(dto.getIdUsuario());
+
+        // 2. Validar que la subasta existe
+        subastaClient.obtenerSubastaPorId(dto.getIdSubasta());
+
+
         Oferta oferta = new Oferta();
         oferta.setMonto(dto.getMonto());
         oferta.setIdUsuario(dto.getIdUsuario());
@@ -77,7 +88,7 @@ public class OfertaService {
         Oferta ofertaGuardada = ofertaRepository.save(oferta);
         log.debug("Oferta guardada exitosamente con ID: {}", ofertaGuardada.getId());
 
-        return mapToResponseDTO(ofertaRepository.save(oferta));
+        return mapToResponseDTO(ofertaGuardada);
     }
 
     //Actualizar oferta
