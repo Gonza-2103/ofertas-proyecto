@@ -26,8 +26,8 @@ Módulo de alta concurrencia encargado de registrar y validar las ofertas de los
 * logging.level.cl.sda1085.ofertas=DEBUG
 
 # URLs de servicios externos
-subastas-service.url=http://localhost:8083/api/subastas
-usuarios-service.url=http://localhost:8081/api/usuarios
+* subastas-service.url=http://localhost:8083/api/subastas
+* usuarios-service.url=http://localhost:8081/api/usuarios
 
 
 ## Pasos para Ejecutar
