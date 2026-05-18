@@ -30,7 +30,7 @@ public class GlobalExceptionHandler {
     //Errores de lógica de negocio (RuntimeException personalizados)
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<Map<String, String>> handleRuntimeException(RuntimeException ex) {
-        log.error("Ocurrió un error de negocio {} - Tipo: {}", ex.getMessage(), ex.getName);
+        log.error("Ocurrió un error de negocio {} - Tipo: {}", ex.getMessage(), ex.getClass().getName());
         Map<String, String> error = new LinkedHashMap<>();
 
         // Agregamos una llave descriptiva para que el JSON sea más claro
